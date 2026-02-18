@@ -47,7 +47,7 @@ from rich import box
 
 BASE_URL = "https://library.kct.ac.in/opac-tmpl/bootstrap/QB/QB{qid}.pdf"
 START_ID = 11000
-END_ID = 12999
+END_ID = 14000
 OUTPUT_DIR = Path(__file__).parent / "QuestionPapers"
 TEMP_DIR = Path(__file__).parent / ".qb_temp"
 
@@ -204,10 +204,15 @@ def organize_file(pdf_bytes: bytes, course_code: str, stats: Stats) -> Path | No
 
     target_path = target_dir / f"{course_code}.pdf"
 
-    # If file already exists with same course code, add QB id suffix
+    # If file already exists with same course code, add incremental suffix
+    # e.g., U18MEE0034.pdf, U18MEE0034_2.pdf, U18MEE0034_3.pdf
     if target_path.exists():
-        # File already organized — skip duplicate
-        return target_path
+        counter = 2
+        while True:
+            target_path = target_dir / f"{course_code}_{counter}.pdf"
+            if not target_path.exists():
+                break
+            counter += 1
 
     with open(target_path, "wb") as f:
         f.write(pdf_bytes)
